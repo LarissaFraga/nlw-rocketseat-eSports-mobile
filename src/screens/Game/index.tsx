@@ -8,12 +8,14 @@ import { Entypo } from '@expo/vector-icons'
 import { THEME } from "../../theme";
 import logoImg from '../../assets/logo-nlw-esports.png'
 import { Heading } from "../../components/Heading";
+import { DuoMatch } from "../../components/DuoMatch";
 import { DuoCard, DuoCardProps } from "../../components/DuoCard";
 import { useEffect, useState } from "react";
 
 export function Game() {
 
   const [duos, setDuos] = useState<DuoCardProps[]>([])
+  const [discordDuoSelected, setDiscordDuoSelected] = useState<string>('')
     
   const navigation = useNavigation()
   const route = useRoute()
@@ -21,6 +23,12 @@ export function Game() {
 
   function handleGoBack() {
     navigation.goBack()
+  }
+
+  async function getDiscordUser(adsId : string) {
+    fetch(`http://192.168.0.131:3333/games/${adsId}/discord`)
+      .then((response) => response.json())
+      .then((data) => setDiscordDuoSelected(data));
   }
 
   useEffect(() => {
@@ -66,7 +74,7 @@ export function Game() {
           renderItem={({ item }) => (
             <DuoCard 
               data={item}
-              onConnect={() => {}}
+              onConnect={() => getDiscordUser(item.id)}
             />
           )}
           horizontal
@@ -80,6 +88,11 @@ export function Game() {
           )}
         />
 
+        <DuoMatch 
+          visible={discordDuoSelected.length > 0}
+          discord={discordDuoSelected}
+          onClose={() => setDiscordDuoSelected('')}
+        />
 
       </SafeAreaView>
     </Background>
